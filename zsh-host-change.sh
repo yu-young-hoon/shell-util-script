@@ -1,15 +1,14 @@
 #!/usr/bin/env zsh
 
-clear
-echo "HOST 변경"
-echo "1. LOCAL 환경"
-echo "2. DEV 환경"
-echo "3. QA 환경"
-echo "4. STG 환경"
-
+location=$0
 ans="y"
-function input_env {
 
+function input_env {
+    echo "HOST 변경"
+    echo "1. LOCAL 환경"
+    echo "2. DEV 환경"
+    echo "3. QA 환경"
+    echo "4. STG 환경"
     echo "숫자를 입력하세요:"
     read ans
     excute_host_setting
@@ -58,4 +57,18 @@ function stg_env {
     echo -n > "/etc/hosts"
     echo 123.123.123.123 stg.simuruk.com >> "/etc/hosts"
 }
-input_env
+
+function root_check {
+    clear
+    if ! [ $(id -u) = 0 ]
+    then
+        echo "hosts를 변경하기 위해서 루트 권한이 필요합니다."
+        sudo -S $location
+        exit 1
+    fi
+    if [ $(id -u) = 0 ]
+    then
+        input_env
+    fi
+}
+root_check
